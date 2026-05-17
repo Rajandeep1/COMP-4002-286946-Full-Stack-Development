@@ -1,16 +1,10 @@
-// Main component — the body of the directory, listing all departments
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
 
-import DepartmentSection from './DepartmentSection';
-import departments from '../data/departments';
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
 
-const Main = () => {
-  return (
-    <main id="main-content" className="main-content">
-      {departments.map((department) => (
-        <DepartmentSection key={department.name} department={department} />
-      ))}
-    </main>
-  );
-};
-
-export default Main;
