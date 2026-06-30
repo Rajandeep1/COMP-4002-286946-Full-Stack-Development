@@ -13,7 +13,7 @@ fs_lab-4.1/
 
 ## Running locally
 
-You need **two terminals** — one for each app.
+we need **two terminals** — one for each app.
 
 ### 1. Start the back-end
 ```bash
