@@ -1,9 +1,5 @@
-# Pixell River Financial — Lab 4.2
-
-Extends Lab 3.2 by replacing in-memory data with a PostgreSQL database via Prisma ORM.
-
+# Pixell River Financial 
 ## Database schema (3NF)
-
 ```
 Department       — id, name (unique)
 Employee         — id, firstName, lastName?, departmentId (FK → Department)
@@ -13,26 +9,13 @@ LeadershipMember — id, firstName, lastName?, roleTitle (unique)
 3NF: every non-key column depends only on its own table's primary key.
 Employee stores departmentId (FK) not department attributes — no transitive dependency.
 firstName and lastName are separate atomic columns (1NF).
-
----
-
-## Setup — Local PostgreSQL via Docker
-
-```bash
-# 1. Start Postgres container
-docker run --name pixell-postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=pixell_river \
-  -p 5432:5432 \
-  -d postgres:16
-
-# 2. Install dependencies
+# 1. Install dependencies
 npm install
 
-# 3. Run migrations and seed (creates tables + populates all data)
+# 2. Run migrations and seed (creates tables + populates all data)
 npx prisma migrate dev --name init
 
-# 4. Start the app
+# 3. Start the app
 npm run dev
 ```
 
