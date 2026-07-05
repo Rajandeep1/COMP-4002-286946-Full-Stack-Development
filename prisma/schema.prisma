@@ -1,0 +1,61 @@
+// Prisma schema for Pixell River Financial — Lab 4.2
+//
+// Database provider: PostgreSQL (Neon on Vercel, or local Docker instance).
+// For local development without Docker, change provider to "sqlite" and
+// DATABASE_URL to "file:./dev.db".
+//
+// ── Third Normal Form verification ──────────────────────────────────────────
+//
+// Department
+//   - id (PK), name
+//   - 'name' depends only on 'id'. No transitive dependencies.
+//   - 1NF: no multi-valued columns. Employees are in a separate table.
+//
+// Employee
+//   - id (PK), firstName, lastName (nullable), departmentId (FK)
+//   - firstName and lastName describe this employee, not the department.
+//   - departmentId is a FK reference — no department attributes are stored
+//     here (that would violate 3NF via transitive dependency: Employee.name
+//     → Employee.departmentId → Department.name).
+//   - Splitting firstName/lastName satisfies 1NF (atomic values).
+//
+// LeadershipMember
+//   - id (PK), firstName, lastName (nullable), roleTitle
+//   - Each column depends only on the member's own id.
+//   - roleTitle is the title this specific person holds — it is not a
+//     reference to a separate Role entity because each role is unique and
+//     occupied by exactly one person (enforced by @@unique([roleTitle])).
+//     If multiple people could share a role type, roleTitle would need
+//     its own table — but that is not the case in the case study (pg. 15).
+//   - No transitive dependency: firstName does not determine roleTitle,
+//     and roleTitle does not determine firstName.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Department {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  employees Employee[]
+}
+
+model Employee {
+  id           Int        @id @default(autoincrement())
+  firstName    String
+  lastName     String?
+  departmentId Int
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+}
+
+model LeadershipMember {
+  id        Int     @id @default(autoincrement())
+  firstName String
+  lastName  String?
+  roleTitle String  @unique
+}
