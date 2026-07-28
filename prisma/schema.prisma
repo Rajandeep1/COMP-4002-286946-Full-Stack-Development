@@ -1,0 +1,52 @@
+// Prisma schema for Pixell River Financial — Lab 5.1
+//
+// SCHEMA FIX (per Lab 4.2 feedback):
+// Role now represents a leadership title only. A separate EmployeeRole
+// junction table links an Employee to a Role — Role no longer stores
+// firstName/lastName directly.
+//
+// ── 3NF verification ────────────────────────────────────────────────────────
+// Department   — id, name. No repeating groups.
+// Employee     — id, firstName, lastName?, departmentId (FK). No dept data.
+// Role         — id, title (unique). Title only, no person attributes.
+// EmployeeRole — id, employeeId (FK), roleId (FK).
+//                @@unique on both sides: one employee ↔ one role.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Department {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  employees Employee[]
+}
+
+model Employee {
+  id           Int           @id @default(autoincrement())
+  firstName    String
+  lastName     String?
+  departmentId Int
+  department   Department    @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  employeeRole EmployeeRole?
+}
+
+model Role {
+  id           Int           @id @default(autoincrement())
+  title        String        @unique
+  employeeRole EmployeeRole?
+}
+
+// Junction: one Employee holds one Role, one Role is held by one Employee.
+model EmployeeRole {
+  id         Int      @id @default(autoincrement())
+  employeeId Int      @unique
+  roleId     Int      @unique
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  role       Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+}
