@@ -1,4 +1,4 @@
-// requireAuth.ts — middleware that verifies the Clerk session token on
+﻿// requireAuth.ts — middleware that verifies the Clerk session token on
 // incoming POST requests. The front-end attaches the token as a Bearer
 // token in the Authorization header using Clerk's getToken() method.
 //
@@ -9,11 +9,7 @@
 // be authenticated to have been made by the front-end with a logged-in user."
 
 import { Request, Response, NextFunction } from 'express';
-import { createClerkClient } from '@clerk/express';
-
-const clerk = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
-});
+import { verifyToken } from '@clerk/express';
 
 export interface AuthenticatedRequest extends Request {
   userId?: string;
@@ -34,7 +30,9 @@ export const requireAuth = async (
   const token = authHeader.split(' ')[1];
 
   try {
-    const payload = await clerk.verifyToken(token);
+    const payload = await verifyToken(token, {
+      secretKey: process.env.CLERK_SECRET_KEY,
+    });
     req.userId = payload.sub;
     next();
   } catch {
